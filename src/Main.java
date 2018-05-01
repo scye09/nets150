@@ -1,15 +1,12 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +35,7 @@ public class Main {
         }
         
       }
+      scanner.close();
     } catch (FileNotFoundException e) {
 
       e.printStackTrace();
@@ -69,6 +67,7 @@ public class Main {
    
         }
       }
+      scanner.close();
     } catch (FileNotFoundException e) {
       // do nothing
     }
@@ -105,6 +104,7 @@ public class Main {
       System.out.println(getMovieGivenTitle(input));
       
     }
+    scanner.close();
   }
   
   /**
