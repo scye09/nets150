@@ -10,7 +10,7 @@ import java.util.Set;
 public class VectorSpaceModel {
   
   /**
-   * The corpus of documents.
+   * The corpus of movies.
    */
   private Corpus corpus;
 
@@ -27,7 +27,7 @@ public class VectorSpaceModel {
    * This creates the tf-idf vectors.
    */
   private void createTfIdfWeights() {
-    System.out.println("Creating the tf-idf weight vectors");
+//    System.out.println("Creating the tf-idf weight vectors");
     Set<String> terms = corpus.getInvertedIndex().keySet();
     
     for (Movie movie : corpus.getMovies()) {

@@ -18,6 +18,10 @@ public class Main {
   private static String summaryFile = "plot_summaries1.txt";
   private static String metadataFile = "movie.metadata.tsv";
   
+  /**
+   * Read the file that contains movie summaries to extract the id and summary
+   * @return Map of <ID, Summary> entries
+   */
   public static HashMap<Integer, String> readSummaryFile() {
     File file = new File(summaryFile);
     HashMap<Integer, String> movieSummaries = new HashMap<>();
@@ -41,6 +45,10 @@ public class Main {
     return movieSummaries;
   }
   
+  /**
+   * Read the file that contains movie titles and their associated id's.
+   * @return Hashmap of <ID, title> pairs
+   */
   public static HashMap<Integer, String> readMetadataFile() {
     File file = new File(metadataFile);
     HashMap<Integer, String> movieTitles = new HashMap<>();
@@ -48,7 +56,7 @@ public class Main {
       Scanner scanner = new Scanner(file);
   
       while (scanner.hasNextLine()) {
-        // assumes there is a year; data is not well-formatted
+        // assumes there is a year; data is not well-formatted in file
         Pattern pattern = Pattern.compile("(\\d+)(\t)([^\\s]+)(\t)(.*)(\t*)(\\d\\d\\d\\d)(.*)");
         Matcher m = pattern.matcher(scanner.nextLine());
         if (m.find()) {
@@ -62,68 +70,137 @@ public class Main {
         }
       }
     } catch (FileNotFoundException e) {
-      
+      // do nothing
     }
     return movieTitles;
   }
   
-  public static HashMap<String, String> getMovies(String searchText) {
+  /**
+   * Match movies and their summaries together.
+   * @return hashmap of <movie, summary> pairs
+   */
+  public static HashMap<String, String> getMovies() {
     HashMap<Integer, String> movieSummaries = readSummaryFile();
     HashMap<Integer, String> movieTitles = readMetadataFile();
     
     HashMap<String, String> movies = new HashMap<>();
     
     for (Map.Entry<Integer, String> entry : movieSummaries.entrySet()) {
-      movies.put(movieTitles.get(entry.getKey()), entry.getValue());
+      if (movieTitles.get(entry.getKey()) != null) {
+        movies.put(movieTitles.get(entry.getKey()).toLowerCase(), entry.getValue());
+      }
     }
     return movies;
   }
   
-  public static void getMoviesAndSummaries(String searchText) {
+  public static void main(String[] args) {
+
+    System.out.println("Please enter a movie title or description");
     
-    HashMap<String, String> getMovies = getMovies(searchText);
+    Scanner scanner = new Scanner(System.in);
+    if (scanner.hasNextLine()) {
+      String input = scanner.nextLine();
+//      getMoviesAndSummaries(input);
+//      System.out.println(getMovieGivenSummary(input));
+      System.out.println(getMovieGivenTitle(input));
+      
+    }
+  }
+  
+  /**
+   * Given a movie title (assumed to be in the database), return a different movie whose summary
+   * most closely matches the given movie's summary using the vector space model
+   * @param movieTitle is movie to match
+   * @return movie title with highest cosine similarity
+   */
+  public static String getMovieGivenTitle(String movieTitle) {
+    movieTitle = movieTitle.toLowerCase();
+    String match = "No matches";
+    
+    HashMap<String, String> getMovies = getMovies();
     ArrayList<Movie> movies = new ArrayList<>(getMovies.size() + 1);
-    movies.add(new Movie("query", searchText));
     
+    // ensure that movie is in the database
+    if (getMovies.containsKey(movieTitle)) {
+      movies.add(new Movie(movieTitle, getMovies.get(movieTitle)));
+      
+      for (Map.Entry<String, String> entry : getMovies.entrySet()) {
+        // add the movie to the corpus if the movie is not the movie given as input
+        if (entry.getKey() != null && !entry.getKey().equalsIgnoreCase(movieTitle)) {
+        movies.add(new Movie(entry.getKey(), entry.getValue()));
+        }
+      }
+      
+      Corpus corpus = new Corpus(movies);
+      VectorSpaceModel model = new VectorSpaceModel(corpus);
+      
+      // calculate cosine similarity between input movie and all other movies
+      HashMap<String, Double> sorted = new HashMap<>();
+      for (int i = 1; i < movies.size(); i++) {
+        double similarity = model.cosineSimilarity(movies.get(0), movies.get(i));
+        sorted.put(movies.get(i).getTitle(), similarity);
     
-    for (Map.Entry<String, String> entry : getMovies.entrySet()) {
-      if (entry.getKey() != null) {
-      movies.add(new Movie(entry.getKey(), entry.getValue()));
+      }
+      // sort movies by cosine similarity
+      TreeMap<String, Double> sortedMovies = new TreeMap<>(new ValueComparator(sorted));
+      sortedMovies.putAll(sorted);
+      
+      Iterator<Map.Entry<String, Double>> iterator = sortedMovies.entrySet().iterator();
+  
+      if (iterator.hasNext()) {
+        match = iterator.next().getKey();
       }
     }
+    
+    return match;
+  }
   
+  /**
+   * Given a string of words / a movie summary, find a movie that most closely matches this string
+   * using the vector space model.
+   * @param summary is query text to match 
+   * @return movie with highest cosine similarity 
+   */
+  public static String getMovieGivenSummary(String summary) {
+    String bestMatch = "";
+    
+    // get movies in <title, summary> form
+    HashMap<String, String> getMovies = getMovies();
+    ArrayList<Movie> movies = new ArrayList<>(getMovies.size() + 1);
+    movies.add(new Movie("query", summary));
+    
+    // add movies to arraylist to create corpus
+    for (Map.Entry<String, String> entry : getMovies.entrySet()) {
+      if (entry.getKey() != null) {
+        movies.add(new Movie(entry.getKey(), entry.getValue()));
+      }
+    }
+    
     Corpus corpus = new Corpus(movies);
     VectorSpaceModel model = new VectorSpaceModel(corpus);
     
-    
+    // compare movie summaries to the input text
     HashMap<String, Double> sorted = new HashMap<>();
     for (int i = 1; i < movies.size(); i++) {
       double similarity = model.cosineSimilarity(movies.get(0), movies.get(i));
       sorted.put(movies.get(i).getTitle(), similarity);
   
     }
+    // sort movies by cosine similarity
     TreeMap<String, Double> sortedMovies = new TreeMap<>(new ValueComparator(sorted));
     sortedMovies.putAll(sorted);
     
-    int i = 0;
     Iterator<Map.Entry<String, Double>> iterator = sortedMovies.entrySet().iterator();
-    while (i < 10) {
-      i++;
-        System.out.println(iterator.next());
+    if (iterator.hasNext()) {
+      bestMatch = iterator.next().getKey();
     }
-  } 
-  
-  public static void main(String[] args) {
-    System.out.println("Please enter the description of a movie you enjoyed");
     
-    Scanner scanner = new Scanner(System.in);
-    if (scanner.hasNextLine()) {
-      String input = scanner.nextLine();
-      getMoviesAndSummaries(input);
-      
-    }
+    return bestMatch;
   }
   
+  /**
+   * Class to sort a HashMap by value
+   */
   static class ValueComparator implements Comparator<String> {
     HashMap<String, Double> sortedMap = new HashMap<String, Double>();
     
