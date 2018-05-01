@@ -22,42 +22,70 @@ const bot = new BootBot({
 //   console.log(data);
 // });
 
-bot.setGreetingText("Hello!");
-
- bot.on('message', (payload, chat) => {
-   const text = payload.message.text;
-   chat.say(`Echo: ${text}`);
- });
-
+// Listen for keywords to start the bot
 bot.hear(['hi', 'hello', 'hey'], (payload, chat) => {
   chat.say('Type "1" to get movie recommendations based on other movie titles; type "2" to get movie recommendations'
           + 'based on movie descriptions.');
 });
 
+// When 1 is typed, prompt user to enter "title someMovieTitle"
 bot.hear('1', (payload, chat) => {
   chat.say('Type "title" and enter a movie title:');
+  
 });
 
+// Listen for the title the user entered and get best match
 bot.hear(/title (.*)/i, (payload, chat, data) => {
   const query =  String(data.match[1]);
-  const res = query.toLowerCase();
-  chat.say("I hear you.");
+  const movie = query.toLowerCase();
+  // chat.say("I hear you.");
   // var test = new Packages.test();
   // System.out.println(test.tests("Interstellar"));
   // chat.say(test.tests("Interstellar"));
+
+  // const movie = payload.message.text;
+  // console.log(movie);
+
+  java.callStaticMethod("Main", "getMovieGivenTitle", movie, function(err, results) {
+    if (err) {
+      console.error(err); return;
+    }
+    // do something with results
+    // console.log(results);
+    chat.say("We recommend you watch " +  results);
+  
+  });
+
 });
 
-java.callStaticMethod("Main", "getMovieGivenTitle", "The Hunger Games", function(err, results) {
-  if (err) {
-    console.error(err); return;
-  }
-  // do something with results
-  console.log(results);
 
-});
-
+//When 2 is typed, prompt user to enter "summary someKeywords"
 bot.hear('2', (payload, chat) => {
-  chat.say('Enter keywords from movie descriptions:');
+  chat.say('Type "summary" and then enter keywords from movie descriptions:');
+  
+});
+
+// Listen for the summary/keywords and get best movie match
+bot.hear(/summary (.*)/i, (payload, chat, data) => {
+  const query =  String(data.match[1]);
+  const summary = query.toLowerCase();
+  // chat.say("I hear you.");
+  // var test = new Packages.test();
+  // System.out.println(test.tests("Interstellar"));
+  // chat.say(test.tests("Interstellar"));
+
+  // const movie = payload.message.text;
+  // console.log(movie);
+
+  java.callStaticMethod("Main", "getMovieGivenSummary", summary, function(err, results) {
+    if (err) {
+      console.error(err); return;
+    }
+    // do something with results
+    chat.say("We recommend you watch " + results);
+  
+  });
+
 });
 
 bot.start(config.get('botPort'));
