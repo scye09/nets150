@@ -14,28 +14,35 @@ const bot = new BootBot({
   appSecret: config.get('appSecret')
 });
 
-/**
- * Demo handler to echo back whatever the user says.
- * Feel free to delete this handler and start hacking!
- */
- // bot.setGetStartedButton((payload, chat) => {
- //   const welcome1 = `Hey there, trainer! How well you think you ...`;
- //   const welcome2 = `Type START or PLAY to join the challenge!`;
- //   const options = { typing: true };
- //   chat.say(welcome1, options)
- //     .then(() => chat.say(welcome2, options));
- // });
+// var fs = require('fs');
+// fs.readFile('./test.java', (err, data) => {
+//   if (err) throw err;
+//   console.log(data);
+// });
 
+bot.setGreetingText("Hello!");
 
  bot.on('message', (payload, chat) => {
-   console.log("sdfs");
    const text = payload.message.text;
    chat.say(`Echo: ${text}`);
  });
 
 bot.hear(['hi', 'hello', 'hey'], (payload, chat) => {
-  chat.say('Hello, Type Genre then add the movie genre of the recommendation you want. ');
-  console.log("I'M WORKING!!");
+  chat.say('Type "1" to get movie recommendations based on other movie titles; type "2" to get movie recommendations'
+          + 'based on movie descriptions.');
+});
+
+bot.hear('1', (payload, chat) => {
+  chat.say('Type "title" and enter a movie title:');
+});
+
+bot.hear(/title (.*)/i, (payload, chat, data) => {
+  const query =  String(data.match[1]);
+  const res = query.toLowerCase();
+  chat.say("I hear you.");
+  // var test = new Packages.test();
+  // System.out.println(test.tests("Interstellar"));
+  // chat.say(test.tests("Interstellar"));
 });
 
 java.callStaticMethod("Main.class", "getMovieGivenTitle", "The Hunger Games", function(err, results) {
@@ -45,6 +52,10 @@ java.callStaticMethod("Main.class", "getMovieGivenTitle", "The Hunger Games", fu
   // do something with results
   console.log(results);
 
+});
+
+bot.hear('2', (payload, chat) => {
+  chat.say('Enter keywords from movie descriptions:');
 });
 
 bot.start(config.get('botPort'));

@@ -11,8 +11,6 @@
   "license": "MIT",
   "dependencies": {
     "bootbot": "^1.0.6",
-    "config": "^1.21.0",
-    "java": "^0.9.1",
-    "java-func-caller": "0.0.8"
+    "config": "^1.21.0"
   }
 }
