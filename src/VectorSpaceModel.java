@@ -61,6 +61,12 @@ public class VectorSpaceModel {
     return Math.sqrt(magnitude);
   }
 
+  /**
+   * This will take two documents and return the dot product.
+   * @param d1 Document 1
+   * @param d2 Document 2
+   * @return the dot product of the documents
+   */
   private double getDotProduct(Movie d1, Movie d2) {
     double product = 0;
     HashMap<String, Double> weights1 = tfIdfWeights.get(d1);
@@ -73,6 +79,13 @@ public class VectorSpaceModel {
     return product;
   }
   
+  /**
+   * This will return the cosine similarity of two documents.
+   * This will range from 0 (not similar) to 1 (very similar).
+   * @param d1 Document 1
+   * @param d2 Document 2
+   * @return the cosine similarity
+   */
   public double cosineSimilarity(Movie d1, Movie d2) {
     return getDotProduct(d1, d2) / (getMagnitude(d1) * getMagnitude(d2));
   }
