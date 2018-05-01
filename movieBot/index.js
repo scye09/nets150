@@ -2,11 +2,13 @@
 const BootBot = require('bootbot');
 const config = require('config');
 var java = require("java");
+java.classpath.push("commons-lang3-3.1.jar");
+java.classpath.push("commons-io.jar");
 java.classpath.push("Main.jar");
 java.classpath.push("Movie.jar");
 java.classpath.push("Corpus.jar");
 java.classpath.push("VectorSpaceModel.jar")
-java.classpath.push("Main$ValueComparator.class");
+java.classpath.push("Main$ValueComparator.jar");
 
 const bot = new BootBot({
   accessToken: config.get('accessToken'),
@@ -45,7 +47,7 @@ bot.hear(/title (.*)/i, (payload, chat, data) => {
   // chat.say(test.tests("Interstellar"));
 });
 
-java.callStaticMethod("Main.class", "getMovieGivenTitle", "The Hunger Games", function(err, results) {
+java.callStaticMethod("Main", "getMovieGivenTitle", "The Hunger Games", function(err, results) {
   if (err) {
     console.error(err); return;
   }

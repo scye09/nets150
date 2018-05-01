@@ -141,15 +141,18 @@ public class Main {
         sorted.put(movies.get(i).getTitle(), similarity);
     
       }
-      // sort movies by cosine similarity
-      TreeMap<String, Double> sortedMovies = new TreeMap<>(new ValueComparator(sorted));
-      sortedMovies.putAll(sorted);
       
-      Iterator<Map.Entry<String, Double>> iterator = sortedMovies.entrySet().iterator();
-  
-      if (iterator.hasNext()) {
-        match = iterator.next().getKey();
+      double largest = -1;
+      String bestMovie = "";
+      
+      for (Map.Entry<String, Double> entry : sorted.entrySet()) {
+        if (sorted.get(entry.getKey()) > largest) {
+          bestMovie = entry.getKey();
+          largest = sorted.get(entry.getKey());
+        }
       }
+      match = bestMovie;
+      
     }
     
     return match;
@@ -186,14 +189,16 @@ public class Main {
       sorted.put(movies.get(i).getTitle(), similarity);
   
     }
-    // sort movies by cosine similarity
-    TreeMap<String, Double> sortedMovies = new TreeMap<>(new ValueComparator(sorted));
-    sortedMovies.putAll(sorted);
+    double largest = -1;
+    String bestMovie = "";
     
-    Iterator<Map.Entry<String, Double>> iterator = sortedMovies.entrySet().iterator();
-    if (iterator.hasNext()) {
-      bestMatch = iterator.next().getKey();
+    for (Map.Entry<String, Double> entry : sorted.entrySet()) {
+      if (sorted.get(entry.getKey()) > largest) {
+        bestMovie = entry.getKey();
+        largest = sorted.get(entry.getKey());
+      }
     }
+    bestMatch = bestMovie;
     
     return bestMatch;
   }
