@@ -1,6 +1,12 @@
 'use strict';
 const BootBot = require('bootbot');
 const config = require('config');
+var java = require("java");
+java.classpath.push("Main.jar");
+java.classpath.push("Movie.jar");
+java.classpath.push("Corpus.jar");
+java.classpath.push("VectorSpaceModel.jar")
+java.classpath.push("Main$ValueComparator.class");
 
 const bot = new BootBot({
   accessToken: config.get('accessToken'),
@@ -30,6 +36,15 @@ const bot = new BootBot({
 bot.hear(['hi', 'hello', 'hey'], (payload, chat) => {
   chat.say('Hello, Type Genre then add the movie genre of the recommendation you want. ');
   console.log("I'M WORKING!!");
+});
+
+java.callStaticMethod("Main.class", "getMovieGivenTitle", "The Hunger Games", function(err, results) {
+  if (err) {
+    console.error(err); return;
+  }
+  // do something with results
+  console.log(results);
+
 });
 
 bot.start(config.get('botPort'));
