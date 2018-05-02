@@ -1,6 +1,7 @@
-# movieBot
+Team Members: Sophia Ye & Sarah Rittgers
+Project Category: Implementation
 
-Made with [BootBot CLI](https://github.com/Charca/bootbot-cli)
+Recommendations and Document Search
 
 Using the Facebook Messenger API, we created a Facebook chat bot that provides
 movie recommendations to users. To determine important recommendations, we used
@@ -14,12 +15,10 @@ words in its description. The dataset that we used contained synopses of over
 Our project is based off of the process described at this link:
 https://chatbotslife.com/building-a-messenger-movie-recommendations-chatbot-in-20-minutes-or-less-d0f06ad06d4b
 
-## Usage
-
-```
-npm install
-```
-
-```
-bootbot start
-```
+Work Breakdown:
+Sarah:
+- Parsed dataset
+- Implemented vector space model and cosine similarity function
+Sophia:
+- Set up Messenger API and BootBot
+- Implemented and published chatbot
